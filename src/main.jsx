@@ -1,7 +1,8 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import { Grid, GridColumn as Column } from '@progress/kendo-react-grid';
-import products from './products.json';
+import * as React from "react";
+import * as ReactDOM from "react-dom";
+import { Grid, GridColumn as Column } from "@progress/kendo-react-grid";
+import products from "./products.json";
+
 const DetailComponent = (props) => {
   const dataItem = props.dataItem;
   return (
@@ -20,17 +21,20 @@ const DetailComponent = (props) => {
           <strong>Discontinued:</strong> {dataItem.Discontinued}
         </p>
         <p>
-          <strong>Category:</strong> {dataItem.Category.CategoryName} -{' '}
+          <strong>Category:</strong> {dataItem.Category.CategoryName} -{" "}
           {dataItem.Category.Description}
         </p>
       </section>
-      {/* <GridComponent /> */}
+      <GridComponent level={props.level} />
     </>
   );
 };
 
-const GridComponent = () => {
-  const [data, setData] = React.useState(products);
+const GridComponent = ({ level = 1 }) => {
+  const [data, setData] = React.useState(
+    products.map((item) => ({ ...item, expanded: false }))
+  );
+
   const expandChange = (event) => {
     let newData = data.map((item) => {
       if (item.ProductID === event.dataItem.ProductID) {
@@ -40,12 +44,17 @@ const GridComponent = () => {
     });
     setData(newData);
   };
+
   return (
     <Grid
       data={data}
-      detail={DetailComponent}
+      detail={
+        level < 4
+          ? (props) => <DetailComponent {...props} level={level + 1} />
+          : null
+      }
       style={{
-        height: '400px',
+        height: "400px",
       }}
       expandField="expanded"
       onExpandChange={expandChange}
@@ -61,4 +70,4 @@ const GridComponent = () => {
 const App = () => {
   return <GridComponent />;
 };
-ReactDOM.render(<App />, document.querySelector('my-app'));
+ReactDOM.render(<App />, document.querySelector("my-app"));
